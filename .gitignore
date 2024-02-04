@@ -1,0 +1,6 @@
+# compiled
+dist
+tmp
+
+# dev
+.env

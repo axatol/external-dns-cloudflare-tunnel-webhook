@@ -1,0 +1,9 @@
+# compiled
+dist
+
+# docs
+README.md
+LICENSE
+
+# dev
+.env
