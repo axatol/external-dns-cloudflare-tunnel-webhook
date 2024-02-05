@@ -2,7 +2,7 @@ OUTPUT ?= dist/app
 BUILD_TIME ?= $(shell date +"%Y-%m-%dT%H:%M:%S%z")
 BUILD_COMMIT ?= $(shell git rev-parse HEAD)
 IMAGE_PLATFORM ?= linux/amd64
-IMAGE_NAME ?= axatol/external-dns-cloudflare-tunnel-webhook
+IMAGE_NAME ?= public.ecr.aws/axatol/external-dns-cloudflare-tunnel-webhook
 IMAGE_TAG ?= latest
 
 LDFLAGS = -s -w

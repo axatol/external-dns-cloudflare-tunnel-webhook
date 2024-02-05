@@ -53,9 +53,29 @@ jobs:
           version: latest
           args: --timeout 1m --verbose
 
+  publish:
+    needs: build
+    if: inputs.publish
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+
+      - uses: axatol/actions/assume-aws-role@release
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.AWS_ECR_IMAGE_PUBLISHER_ROLE_ARN }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: true
+
       - name: Build
-        run: make build-image
+        run: make build-image IMAGE_TAG=${{ inputs.image-tag }}
 
       - name: Publish
-        if: inputs.publish
         run: make publish-image IMAGE_TAG=${{ inputs.image-tag }}
