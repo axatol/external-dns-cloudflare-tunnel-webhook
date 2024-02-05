@@ -1,0 +1,57 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      publish:
+        description: Publish the image
+        default: false
+        type: boolean
+      image-tag:
+        description: The tag of the image
+        default: latest
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the image
+        default: false
+        type: boolean
+      image-tag:
+        description: The tag of the image
+        default: latest
+        type: string
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Setup golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+
+      - name: Run tests
+        run: go test ./...
+
+      - name: Run vet
+        run: go vet ./...
+
+      - name: Build
+        run: make image
+
+      - name: Publish
+        if: inputs.publish
+        run: docker push axatol/external-dns-cloudflare-tunnel-webhook:${{ inputs.image-tag }}

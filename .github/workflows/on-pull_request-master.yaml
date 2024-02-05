@@ -1,0 +1,11 @@
+name: On pull request to master
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    if: github.event.pull_request.draft == false
+    uses: ./.github/workflows/_build.yaml
