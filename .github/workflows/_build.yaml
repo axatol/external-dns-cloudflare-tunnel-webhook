@@ -38,6 +38,9 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Download dependencies
+        run: go mod download
+
       - name: Setup golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
