@@ -79,3 +79,8 @@ jobs:
 
       - name: Publish
         run: make publish-image IMAGE_TAG=${{ inputs.image-tag }}
+
+      - name: Prune ECR
+        uses: axatol/actions/prune-ecr-repository@release
+        with:
+          repository-name: external-dns-cloudflare-tunnel-webhook
