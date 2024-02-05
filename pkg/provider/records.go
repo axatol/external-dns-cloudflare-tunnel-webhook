@@ -164,7 +164,7 @@ func ApplyChanges(ctx context.Context, cf cf.Cloudflare, changes []Change) error
 			Type:    endpoint.RecordTypeCNAME,
 			TTL:     1,
 			Proxied: cloudflare.BoolPtr(true),
-			Comment: fmt.Sprintf("external-dns-cloudflare-tunnel-webhook/%s", change.Service),
+			Comment: change.Service,
 		}
 
 		switch change.Action {
