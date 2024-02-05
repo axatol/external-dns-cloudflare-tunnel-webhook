@@ -39,22 +39,22 @@ jobs:
           go-version-file: go.mod
 
       - name: Download dependencies
-        run: go mod download
+        run: go mod download -x
+
+      - name: Run vet
+        run: go vet ./...
+
+      - name: Run tests
+        run: go test ./...
 
       - name: Setup golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
           version: latest
 
-      - name: Run tests
-        run: go test ./...
-
-      - name: Run vet
-        run: go vet ./...
-
       - name: Build
         run: make build-image
 
       - name: Publish
         if: inputs.publish
-        run: docker push axatol/external-dns-cloudflare-tunnel-webhook:${{ inputs.image-tag }}
+        run: make publish-image IMAGE_TAG=${{ inputs.image-tag }}
