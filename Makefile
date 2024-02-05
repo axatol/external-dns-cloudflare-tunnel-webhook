@@ -9,13 +9,16 @@ LDFLAGS = -s -w
 LDFLAGS += -X main.buildTime=$(BUILD_TIME)
 LDFLAGS += -X main.buildCommit=$(BUILD_COMMIT)
 
-build:
+build-binary:
 	CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" -o $(OUTPUT)
 
-image:
+build-image:
 	docker build \
 		--tag $(IMAGE_NAME):$(IMAGE_TAG) \
 		--platform $(IMAGE_PLATFORM) \
 		--build-arg BUILD_COMMIT=$(BUILD_COMMIT) \
 		--build-arg BUILD_TIME=$(BUILD_TIME) \
 		.
+
+publish-image:
+	docker push $(IMAGE_NAME):$(IMAGE_TAG)

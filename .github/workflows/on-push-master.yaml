@@ -1,9 +1,12 @@
 name: On push to master
 
 on:
-  pull_request:
+  push:
     branches:
       - master
+    paths-ignore:
+      - "**/*.md"
+      - ".github/**"
 
 jobs:
   build:
