@@ -42,15 +42,13 @@ func handleNegotiation(p provider.Provider) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		raw, err := json.Marshal(p.GetDomainFilter())
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(http.StatusText(http.StatusInternalServerError)))
+			write(w, http.StatusInternalServerError, nil)
 			return
 		}
 
 		log.Debug().Str("action", "handleNegotiation").RawJSON("domain_filter", raw).Send()
 		w.Header().Set(contentTypeHeader, externalDNSMediaType)
-		w.WriteHeader(http.StatusOK)
-		w.Write(raw)
+		write(w, http.StatusOK, raw)
 	}
 }
 
@@ -61,23 +59,20 @@ func handleGetRecords(p provider.Provider) http.HandlerFunc {
 		records, err := p.Records(r.Context())
 		if err != nil {
 			log.Error().Err(err).Msg("failed to get records")
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(http.StatusText(http.StatusInternalServerError)))
+			write(w, http.StatusInternalServerError, nil)
 			return
 		}
 
 		raw, err := json.Marshal(records)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to marshal records to json")
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(http.StatusText(http.StatusInternalServerError)))
+			write(w, http.StatusInternalServerError, nil)
 			return
 		}
 
 		log.Debug().RawJSON("records", raw).Send()
 		w.Header().Set(contentTypeHeader, externalDNSMediaType)
-		w.WriteHeader(http.StatusOK)
-		w.Write(raw)
+		write(w, http.StatusOK, raw)
 	}
 }
 
@@ -89,20 +84,18 @@ func handleApplyChanges(p provider.Provider) http.HandlerFunc {
 		if err := json.NewDecoder(r.Body).Decode(&changes); err != nil {
 			log.Error().Err(err).Msg("failed to decode changes")
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(http.StatusText(http.StatusBadRequest)))
+			write(w, http.StatusBadRequest, nil)
 			return
 		}
 
 		if err := p.ApplyChanges(r.Context(), &changes); err != nil {
 			log.Error().Err(err).Any("changes", changes).Msg("failed to apply changes")
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(http.StatusText(http.StatusInternalServerError)))
+			write(w, http.StatusInternalServerError, nil)
 			return
 		}
 
 		log.Debug().Any("changes", changes).Send()
-		w.WriteHeader(http.StatusNoContent)
-		w.Write([]byte(http.StatusText(http.StatusNoContent)))
+		write(w, http.StatusNoContent, nil)
 	}
 }
 
@@ -113,30 +106,26 @@ func handleAdjustEndpoints(p provider.Provider) http.HandlerFunc {
 		var endpoints []*endpoint.Endpoint
 		if err := json.NewDecoder(r.Body).Decode(&endpoints); err != nil {
 			log.Error().Err(err).Msg("failed to decode endpoints")
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(http.StatusText(http.StatusBadRequest)))
+			write(w, http.StatusBadRequest, nil)
 			return
 		}
 
 		endpoints, err := p.AdjustEndpoints(endpoints)
 		if err != nil {
 			log.Error().Err(err).Any("endpoints", endpoints).Msg("failed to adjust endpoints")
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(http.StatusText(http.StatusInternalServerError)))
+			write(w, http.StatusInternalServerError, nil)
 			return
 		}
 
 		raw, err := json.Marshal(endpoints)
 		if err != nil {
 			log.Error().Err(err).Any("endpoints", endpoints).Msg("failed to marshal endpoints to json")
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(http.StatusText(http.StatusInternalServerError)))
+			write(w, http.StatusInternalServerError, nil)
 			return
 		}
 
 		log.Debug().Any("endpoints", endpoints).Send()
 		w.Header().Set(contentTypeHeader, externalDNSMediaType)
-		w.WriteHeader(http.StatusOK)
-		w.Write(raw)
+		write(w, http.StatusOK, raw)
 	}
 }
