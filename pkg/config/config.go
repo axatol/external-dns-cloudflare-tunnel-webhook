@@ -35,12 +35,12 @@ func Configure() error {
 	_ = godotenv.Load()
 
 	if err := env.Set(&Values); err != nil {
-		return fmt.Errorf("failed to load config: %s", err)
+		return fmt.Errorf("failed to load config: %w", err)
 	}
 
 	logLevel, err := zerolog.ParseLevel(Values.LogLevel)
 	if err != nil {
-		return fmt.Errorf("failed to parse log level: %s", err)
+		return fmt.Errorf("failed to parse log level: %w", err)
 	}
 
 	zerolog.SetGlobalLevel(logLevel)

@@ -66,14 +66,14 @@ func (z ZoneMap) GetRecordByName(hostname string) *cloudflare.DNSRecord {
 func GenerateZoneMap(ctx context.Context, cf cf.Cloudflare) (*ZoneMap, error) {
 	zones, err := cf.ListZones(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list zones: %s", err)
+		return nil, fmt.Errorf("failed to list zones: %w", err)
 	}
 
 	zoneMap := ZoneMap{}
 	for _, zone := range zones {
 		records, err := cf.ListZoneRecords(ctx, zone.ID)
 		if err != nil {
-			return nil, fmt.Errorf("failed to get zone records: %s", err)
+			return nil, fmt.Errorf("failed to get zone records: %w", err)
 		}
 
 		recordMap := map[string]cloudflare.DNSRecord{}

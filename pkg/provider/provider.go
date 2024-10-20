@@ -28,7 +28,7 @@ type CloudflareTunnelProvider struct {
 func (p CloudflareTunnelProvider) Records(ctx context.Context) ([]*endpoint.Endpoint, error) {
 	tunnel, err := p.Cloudflare.GetTunnelConfiguration(ctx, p.CloudflareAccountID, p.CloudflareTunnelID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get tunnel configuration: %s", err)
+		return nil, fmt.Errorf("failed to get tunnel configuration: %w", err)
 	}
 
 	endpoints := []*endpoint.Endpoint{}
@@ -74,17 +74,17 @@ func (p CloudflareTunnelProvider) GetDomainFilter() endpoint.DomainFilter {
 func (p CloudflareTunnelProvider) ApplyChanges(ctx context.Context, changes *plan.Changes) error {
 	tunnel, err := p.Cloudflare.GetTunnelConfiguration(ctx, p.CloudflareAccountID, p.CloudflareTunnelID)
 	if err != nil {
-		return fmt.Errorf("failed to get tunnel configuration: %s", err)
+		return fmt.Errorf("failed to get tunnel configuration: %w", err)
 	}
 
 	rules := Rules(tunnel.Config.Ingress)
 	if err := rules.ApplyChanges(changes); err != nil {
-		return fmt.Errorf("failed to apply changes: %s", err)
+		return fmt.Errorf("failed to apply changes: %w", err)
 	}
 
 	zoneMap, err := GenerateZoneMap(ctx, p.Cloudflare)
 	if err != nil {
-		return fmt.Errorf("failed to generate zone map: %s", err)
+		return fmt.Errorf("failed to generate zone map: %w", err)
 	}
 
 	changeset := TunnelDNSChangeSet(p.CloudflareTunnelID, rules, *zoneMap)
@@ -95,12 +95,12 @@ func (p CloudflareTunnelProvider) ApplyChanges(ctx context.Context, changes *pla
 	}
 
 	if err := p.Cloudflare.UpdateTunnelIngress(ctx, p.CloudflareAccountID, p.CloudflareTunnelID, rules); err != nil {
-		return fmt.Errorf("failed to update tunnel ingress rules: %s", err)
+		return fmt.Errorf("failed to update tunnel ingress rules: %w", err)
 	}
 
 	if p.CloudflareSyncDNS {
 		if err := BatchUpdateDNSRecords(ctx, p.Cloudflare, changeset); err != nil {
-			return fmt.Errorf("failed to update zone records: %s", err)
+			return fmt.Errorf("failed to update zone records: %w", err)
 		}
 	}
 

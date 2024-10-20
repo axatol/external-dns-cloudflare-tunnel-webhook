@@ -1,5 +1,7 @@
 # external-dns-cloudflare-tunnel-webhook
 
+Read about how I implemented this [here](https://hsong.me/posts/creating-a-webhook-provider-for-external-dns/).
+
 > [!WARNING]
 > This provider is experimental
 
