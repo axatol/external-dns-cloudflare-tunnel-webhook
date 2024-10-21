@@ -54,7 +54,7 @@ func main() {
 
 	client, err := cf.NewCloudflareClient(config.Values.CloudflareAPIEmail, config.Values.CloudflareAPIKey, config.Values.CloudflareAPIToken)
 	if err != nil {
-		log.Fatal().Err(fmt.Errorf("failed to create cloudflare client: %s", err)).Send()
+		log.Fatal().Err(fmt.Errorf("failed to create cloudflare client: %w", err)).Send()
 	}
 
 	provider := provider.CloudflareTunnelProvider{
@@ -67,7 +67,7 @@ func main() {
 	}
 
 	if err != nil {
-		log.Fatal().Err(fmt.Errorf("failed to create provider: %s", err)).Send()
+		log.Fatal().Err(fmt.Errorf("failed to create provider: %w", err)).Send()
 	}
 
 	server := server.NewServer(config.Values.Port, provider, config.Values.ReadTimeout, config.Values.WriteTimeout)
@@ -77,7 +77,7 @@ func main() {
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Error().Err(fmt.Errorf("failed to start server: %s", err)).Send()
+			log.Error().Err(fmt.Errorf("failed to start server: %w", err)).Send()
 			cancel()
 		}
 	}()
@@ -91,12 +91,12 @@ func main() {
 	go func() {
 		defer cancel()
 		if err := server.Shutdown(ctx); err != nil && err != http.ErrServerClosed {
-			log.Error().Err(fmt.Errorf("failed to shutdown server: %s", err)).Send()
+			log.Error().Err(fmt.Errorf("failed to shutdown server: %w", err)).Send()
 		}
 	}()
 
 	<-ctx.Done()
 	if err := ctx.Err(); err != nil && err != context.Canceled {
-		log.Error().Err(fmt.Errorf("failed to shutdown server: %s", err)).Send()
+		log.Error().Err(fmt.Errorf("failed to shutdown server: %w", err)).Send()
 	}
 }

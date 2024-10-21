@@ -16,6 +16,6 @@ func write(w http.ResponseWriter, status int, body []byte) {
 	}
 
 	if _, err := w.Write(raw); err != nil {
-		log.Error().Err(fmt.Errorf("failed to write response: %s", err)).Send()
+		log.Error().Err(fmt.Errorf("failed to write response: %w", err)).Send()
 	}
 }
