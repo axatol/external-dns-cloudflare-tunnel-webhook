@@ -1,14 +1,14 @@
 module github.com/axatol/external-dns-cloudflare-tunnel-webhook
 
-go 1.21.5
+go 1.23.0
 
 require (
+	github.com/axatol/gonfig v0.0.1
 	github.com/cloudflare/cloudflare-go v0.87.0
-	github.com/codingconcepts/env v0.0.0-20200821220118-a8fbf8d84482
 	github.com/go-chi/chi/v5 v5.0.11
 	github.com/joho/godotenv v1.5.1
 	github.com/rs/zerolog v1.31.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	sigs.k8s.io/external-dns v0.14.0
 )
 
@@ -36,10 +36,9 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/stretchr/objx v0.5.1 // indirect
-	golang.org/x/net v0.20.0 // indirect
-	golang.org/x/sys v0.16.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/net v0.30.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

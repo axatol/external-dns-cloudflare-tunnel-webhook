@@ -25,7 +25,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ${{ github.repository_owner }}
 
     steps:
       - name: Checkout
@@ -46,42 +46,37 @@ jobs:
         run: go vet ./...
 
       - name: Run tests
-        run: go test ./...
+        run: go test -v ./...
 
       - name: Setup golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
           version: latest
           args: --timeout 1m --verbose
+          skip-cache: true
 
-  publish:
-    needs: build
-    if: inputs.publish
-    runs-on: self-hosted
+      - name: Build
+        run: make build-image IMAGE_TAG=${{ inputs.image-tag }}
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          show-progress: false
-
-      - uses: axatol/actions/assume-aws-role@release
+      - name: Assume AWS role
+        uses: axatol/actions/assume-aws-role@release
+        if: inputs.publish
         with:
           aws-region: us-east-1
           role-to-assume: ${{ secrets.AWS_ECR_IMAGE_PUBLISHER_ROLE_ARN }}
 
       - name: Login to ECR
+        if: inputs.publish
         uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: true
 
-      - name: Build
-        run: make build-image IMAGE_TAG=${{ inputs.image-tag }}
-
       - name: Publish
+        if: inputs.publish
         run: make publish-image IMAGE_TAG=${{ inputs.image-tag }}
 
       - name: Prune ECR
+        if: inputs.publish
         uses: axatol/actions/prune-ecr-repository@release
         with:
           repository-name: external-dns-cloudflare-tunnel-webhook

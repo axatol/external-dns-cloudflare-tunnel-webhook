@@ -17,7 +17,6 @@ type CloudflareTunnelProvider struct {
 	Cloudflare          cf.Cloudflare
 	CloudflareAccountID string
 	CloudflareTunnelID  string
-	CloudflareSyncDNS   bool
 	DryRun              bool
 	DomainFilter        []string
 }
@@ -98,10 +97,8 @@ func (p CloudflareTunnelProvider) ApplyChanges(ctx context.Context, changes *pla
 		return fmt.Errorf("failed to update tunnel ingress rules: %w", err)
 	}
 
-	if p.CloudflareSyncDNS {
-		if err := BatchUpdateDNSRecords(ctx, p.Cloudflare, changeset); err != nil {
-			return fmt.Errorf("failed to update zone records: %w", err)
-		}
+	if err := BatchUpdateDNSRecords(ctx, p.Cloudflare, changeset); err != nil {
+		return fmt.Errorf("failed to update zone records: %w", err)
 	}
 
 	return nil
