@@ -11,5 +11,8 @@ on:
 jobs:
   build:
     uses: ./.github/workflows/_build.yaml
+    permissions:
+      contents: read
+      id-token: write
     with:
       publish: true
