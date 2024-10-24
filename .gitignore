@@ -3,4 +3,4 @@ dist
 tmp
 
 # dev
-.env
+.env*

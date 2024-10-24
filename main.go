@@ -44,7 +44,6 @@ func main() {
 		Str("cloudflare_api_token", strings.Repeat("*", len(config.Values.CloudflareAPIToken))).
 		Str("cloudflare_account_id", config.Values.CloudflareAccountID).
 		Str("cloudflare_tunnel_id", config.Values.CloudflareTunnelID).
-		Bool("cloudflare_sync_dns", config.Values.CloudflareSyncDNS).
 		Int64("port", config.Values.Port).
 		Dur("read_timeout", config.Values.ReadTimeout).
 		Dur("write_timeout", config.Values.WriteTimeout).
@@ -61,7 +60,6 @@ func main() {
 		Cloudflare:          client,
 		CloudflareAccountID: config.Values.CloudflareAccountID,
 		CloudflareTunnelID:  config.Values.CloudflareTunnelID,
-		CloudflareSyncDNS:   config.Values.CloudflareSyncDNS,
 		DryRun:              config.Values.DryRun,
 		DomainFilter:        config.Values.DomainFilter,
 	}

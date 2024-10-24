@@ -63,24 +63,27 @@ helm upgrade external-dns-cloudflare-tunnel external-dns/external-dns \
 
 ## Configuration
 
-| Environment variable    | Type            | Default            | Notes |
-| ----------------------- | --------------- | ------------------ | ----- |
-| `LOG_LEVEL`             | `string`        | `"info"`           |       |
-| `LOG_FORMAT`            | `string`        | `"json"`           |       |
-| `CLOUDFLARE_API_KEY`    | `string`        | `""`               | ^1    |
-| `CLOUDFLARE_API_EMAIL`  | `string`        | `""`               | ^1    |
-| `CLOUDFLARE_API_TOKEN`  | `string`        | `""`               | ^1    |
-| `CLOUDFLARE_ACCOUNT_ID` | `string`        |                    | ^2    |
-| `CLOUDFLARE_TUNNEL_ID`  | `string`        |                    | ^2    |
-| `CLOUDFLARE_SYNC_DNS`   | `bool`          | `"false"`          |       |
-| `PORT`                  | `int64`         | `"8888"`           |       |
-| `READ_TIMEOUT`          | `time.Duration` | `"5s"`             |       |
-| `WRITE_TIMEOUT`         | `time.Duration` | `"10s"`            |       |
-| `DRY_RUN`               | `bool`          | `"false"`          |       |
-| `DOMAIN_FILTER`         | `[]string`      | `"" delimiter:","` | ^3    |
+### Kubernetes annotations
+
+| Environment variable    | Flag                     | Type            | Default            | Notes |
+| ----------------------- | ------------------------ | --------------- | ------------------ | ----- |
+| `LOG_LEVEL`             | `-log-level`             | `enum`          | `"info"`           | ^4    |
+| `LOG_FORMAT`            | `-log-format`            | `enum`          | `"json"`           | ^5    |
+| `CLOUDFLARE_API_KEY`    | `-cloudflare-api-key`    | `string`        | `""`               | ^1    |
+| `CLOUDFLARE_API_EMAIL`  | `-cloudflare-api-email`  | `string`        | `""`               | ^1    |
+| `CLOUDFLARE_API_TOKEN`  | `-cloudflare-api-token`  | `string`        | `""`               | ^1    |
+| `CLOUDFLARE_ACCOUNT_ID` | `-cloudflare-account-id` | `string`        |                    | ^2    |
+| `CLOUDFLARE_TUNNEL_ID`  | `-cloudflare-tunnel-id`  | `string`        |                    | ^2    |
+| `PORT`                  | `-port`                  | `int64`         | `"8888"`           |       |
+| `READ_TIMEOUT`          | `-read-timeout`          | `time.Duration` | `"5s"`             |       |
+| `WRITE_TIMEOUT`         | `-write-timeout`         | `time.Duration` | `"10s"`            |       |
+| `DRY_RUN`               | `-dry-run`               | `bool`          | `"false"`          |       |
+| `DOMAIN_FILTER`         | `-domain-filter`         | `[]string`      | `"" delimiter:","` | ^3    |
 
 1. Must specify:
    - _both_ `CLOUDFLARE_API_KEY` and `CLOUDFLARE_API_EMAIL`
    - _or_ `CLOUDFLARE_API_TOKEN`
 2. Required field
 3. Specify multiple by delimiting with `,`
+4. One of `trace`, `debug`, `info`, `warn`, `error`, `fatal`
+5. One of `text`, `json`
