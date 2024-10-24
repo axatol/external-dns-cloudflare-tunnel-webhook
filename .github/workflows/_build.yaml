@@ -23,13 +23,13 @@ on:
         default: latest
         type: string
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build:
     runs-on: ${{ github.repository_owner }}
-
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
       - name: Checkout
