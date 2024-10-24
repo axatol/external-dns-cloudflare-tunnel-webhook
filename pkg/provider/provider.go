@@ -30,9 +30,20 @@ func (p CloudflareTunnelProvider) Records(ctx context.Context) ([]*endpoint.Endp
 		return nil, fmt.Errorf("failed to get tunnel configuration: %w", err)
 	}
 
+	records, err := p.Cloudflare.ListAllZoneRecords(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list all zone records: %w", err)
+	}
+
+	recordMap := cf.RecordMapByName(records)
 	endpoints := []*endpoint.Endpoint{}
+
 	for _, ingress := range tunnel.Config.Ingress {
 		if ingress.Hostname == "" {
+			continue
+		}
+
+		if r, ok := recordMap[ingress.Hostname]; !ok || r == nil {
 			continue
 		}
 
@@ -53,7 +64,8 @@ func (p CloudflareTunnelProvider) Records(ctx context.Context) ([]*endpoint.Endp
 func (CloudflareTunnelProvider) AdjustEndpoints(endpoints []*endpoint.Endpoint) ([]*endpoint.Endpoint, error) {
 	adjusted := []*endpoint.Endpoint{}
 	for _, e := range endpoints {
-		if e.RecordType != endpoint.RecordTypeCNAME {
+		if e.RecordType != endpoint.RecordTypeCNAME &&
+			e.RecordType != endpoint.RecordTypeTXT {
 			continue
 		}
 

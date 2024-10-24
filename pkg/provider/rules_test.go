@@ -18,12 +18,15 @@ func TestRules_CreateRule(t *testing.T) {
 		},
 	}
 
-	err := rules.CreateRule("example2.com", "service2")
+	// same
+	err := rules.CreateRule("example.com", "service1")
 	assert.NoError(t, err)
+	assert.Len(t, rules, 1)
 
-	err = rules.CreateRule("example.com", "service3")
-	assert.Error(t, err)
-	assert.EqualError(t, err, "rule for hostname example.com already exists")
+	// new
+	err = rules.CreateRule("example2.com", "service2")
+	assert.NoError(t, err)
+	assert.Len(t, rules, 2)
 }
 
 func TestRules_UpdateRule(t *testing.T) {
@@ -36,10 +39,11 @@ func TestRules_UpdateRule(t *testing.T) {
 
 	err := rules.UpdateRule("example.com", "service2")
 	assert.NoError(t, err)
+	assert.Len(t, rules, 1)
 
 	err = rules.UpdateRule("example2.com", "service3")
-	assert.Error(t, err)
 	assert.EqualError(t, err, "rule for hostname example2.com does not exist")
+	assert.Len(t, rules, 1)
 }
 
 func TestRules_DeleteRule(t *testing.T) {
@@ -52,19 +56,18 @@ func TestRules_DeleteRule(t *testing.T) {
 
 	err := rules.DeleteRule("example.com")
 	assert.NoError(t, err)
+	assert.Len(t, rules, 0)
 
 	err = rules.DeleteRule("example2.com")
-	assert.Error(t, err)
 	assert.EqualError(t, err, "rule for hostname example2.com does not exist")
+	assert.Len(t, rules, 0)
 }
 
 func TestRules_ApplyChanges(t *testing.T) {
-	rules := provider.Rules{
-		cloudflare.UnvalidatedIngressRule{
-			Hostname: "example.com",
-			Service:  "service1",
-		},
-	}
+	rules := provider.Rules{{
+		Hostname: "example.com",
+		Service:  "service1",
+	}}
 
 	changes := &plan.Changes{
 		Create: []*endpoint.Endpoint{
@@ -83,8 +86,8 @@ func TestRules_ApplyChanges(t *testing.T) {
 		},
 		Delete: []*endpoint.Endpoint{
 			{
-				DNSName:    "example.com",
-				Targets:    []string{"service1"},
+				DNSName:    "example2.com",
+				Targets:    []string{"service2"},
 				RecordType: "CNAME",
 			},
 		},
@@ -92,4 +95,8 @@ func TestRules_ApplyChanges(t *testing.T) {
 
 	err := rules.ApplyChanges(changes)
 	assert.NoError(t, err)
+	assert.Equal(t, provider.Rules{{
+		Hostname: "example.com",
+		Service:  "service3",
+	}}, rules)
 }

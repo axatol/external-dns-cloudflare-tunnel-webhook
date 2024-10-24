@@ -68,6 +68,7 @@ func (p clientImpl) GetTunnelConfiguration(ctx context.Context, accountID, tunne
 		return nil, fmt.Errorf("failed to get tunnel configuration: %w", err)
 	}
 
+	log.Debug().Any("tunnel_configuration", tunnel).Send()
 	return &tunnel, nil
 }
 
@@ -79,7 +80,7 @@ func (p clientImpl) UpdateTunnelIngress(ctx context.Context, accountID, tunnelID
 		return fmt.Errorf("failed to get tunnel configuration: %w", err)
 	}
 
-	log.Debug().Any("tunnel_before", tunnel).Send()
+	log.Trace().Any("tunnel_before", tunnel).Send()
 
 	tunnel.Config.Ingress = ingress
 	params := cloudflare.TunnelConfigurationParams{
@@ -87,12 +88,14 @@ func (p clientImpl) UpdateTunnelIngress(ctx context.Context, accountID, tunnelID
 		Config:   tunnel.Config,
 	}
 
-	log.Debug().Any("tunnel_after", tunnel).Send()
+	log.Trace().Any("tunnel_after", tunnel).Send()
 
-	if _, err := p.api.UpdateTunnelConfiguration(ctx, rc, params); err != nil {
+	tunnel, err = p.api.UpdateTunnelConfiguration(ctx, rc, params)
+	if err != nil {
 		return fmt.Errorf("failed to update tunnel configuration: %w", err)
 	}
 
+	log.Debug().Any("updated_tunnel_configuration", tunnel).Send()
 	return nil
 }
 
@@ -102,6 +105,7 @@ func (p clientImpl) ListZones(ctx context.Context) ([]cloudflare.Zone, error) {
 		return nil, fmt.Errorf("failed to list zones: %w", err)
 	}
 
+	log.Debug().Any("zones", zones).Send()
 	return zones, nil
 }
 
@@ -131,6 +135,7 @@ func (p clientImpl) ListZoneRecords(ctx context.Context, zoneID string) ([]cloud
 		return nil, fmt.Errorf("failed to list dns records for zone %s: %w", zoneID, err)
 	}
 
+	log.Debug().Any("records", records).Send()
 	return records, nil
 }
 
@@ -145,10 +150,12 @@ func (p clientImpl) CreateDNSRecord(ctx context.Context, record cloudflare.DNSRe
 		Content: record.Content,
 	}
 
-	if _, err := p.api.CreateDNSRecord(ctx, rc, params); err != nil {
+	record, err := p.api.CreateDNSRecord(ctx, rc, params)
+	if err != nil {
 		return fmt.Errorf("failed to create dns record %s: %w", record.Name, err)
 	}
 
+	log.Debug().Any("created_record", record).Send()
 	return nil
 }
 
@@ -158,6 +165,7 @@ func (p clientImpl) DeleteDNSRecord(ctx context.Context, zoneID, recordID string
 		return fmt.Errorf("failed to delete dns record %s: %w", recordID, err)
 	}
 
+	log.Debug().Str("deleted_record_id", recordID).Send()
 	return nil
 }
 
@@ -173,9 +181,11 @@ func (p clientImpl) UpdateDNSRecord(ctx context.Context, record cloudflare.DNSRe
 		Content: record.Content,
 	}
 
-	if _, err := p.api.UpdateDNSRecord(ctx, rc, params); err != nil {
+	record, err := p.api.UpdateDNSRecord(ctx, rc, params)
+	if err != nil {
 		return fmt.Errorf("failed to update dns record %s: %w", record.Name, err)
 	}
 
+	log.Debug().Any("updated_record", record).Send()
 	return nil
 }

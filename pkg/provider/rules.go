@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cloudflare/cloudflare-go"
+	"github.com/rs/zerolog/log"
 	"sigs.k8s.io/external-dns/plan"
 )
 
@@ -11,8 +12,13 @@ type Rules []cloudflare.UnvalidatedIngressRule
 
 func (r *Rules) CreateRule(hostname, service string) error {
 	for _, rule := range *r {
-		if rule.Hostname == hostname {
-			return fmt.Errorf("rule for hostname %s already exists", hostname)
+		if rule.Hostname == hostname && rule.Service == service {
+			log.Debug().Str("hostname", hostname).Str("service", service).Msg("rule already exists, skipping")
+			return nil
+		}
+
+		if rule.Hostname == hostname && rule.Service != service {
+			return fmt.Errorf("rule for hostname %s already exists: %s", hostname, service)
 		}
 	}
 
@@ -50,30 +56,18 @@ func (r *Rules) DeleteRule(hostname string) error {
 
 func (r *Rules) ApplyChanges(changes *plan.Changes) error {
 	for _, change := range changes.Create {
-		if change.RecordType != "CNAME" {
-			continue
-		}
-
 		if err := r.CreateRule(change.DNSName, change.Targets[0]); err != nil {
 			return err
 		}
 	}
 
 	for _, change := range changes.UpdateNew {
-		if change.RecordType != "CNAME" {
-			continue
-		}
-
 		if err := r.UpdateRule(change.DNSName, change.Targets[0]); err != nil {
 			return err
 		}
 	}
 
 	for _, change := range changes.Delete {
-		if change.RecordType != "CNAME" {
-			continue
-		}
-
 		if err := r.DeleteRule(change.DNSName); err != nil {
 			return err
 		}
