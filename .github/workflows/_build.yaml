@@ -11,6 +11,9 @@ on:
         description: The tag of the image
         default: latest
         type: string
+    secrets:
+      AWS_ECR_IMAGE_PUBLISHER_ROLE_ARN:
+        required: true
 
   workflow_dispatch:
     inputs:

@@ -15,6 +15,6 @@ jobs:
       contents: read
       id-token: write
     secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_IMAGE_PUBLISHER_ROLE_ARN }}
+      AWS_ECR_IMAGE_PUBLISHER_ROLE_ARN: ${{ secrets.AWS_ECR_IMAGE_PUBLISHER_ROLE_ARN }}
     with:
       publish: true
