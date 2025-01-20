@@ -204,7 +204,7 @@ func BatchUpdateDNSRecords(ctx context.Context, cf cf.Cloudflare, changes []Chan
 			Type:    endpoint.RecordTypeCNAME,
 			TTL:     1,
 			Proxied: cloudflare.BoolPtr(true),
-			Comment: fmt.Sprintf("external-dns-cloudflare-tunnel-webhook/%s", change.Service),
+			Comment: fmt.Sprintf("external-dns/%s", change.Service),
 		}
 
 		switch change.Action {
